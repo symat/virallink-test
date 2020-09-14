@@ -1,3 +1,4 @@
+#!/bin/sh
 apt-get -y purge r-base* r-base-core* r-recommended r-cran-*
 apt-get -y install apt-transport-https
 

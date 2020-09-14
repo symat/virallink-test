@@ -1,3 +1,4 @@
+#!/bin/sh
 add-apt-repository ppa:deadsnakes/ppa
 apt-get update
 

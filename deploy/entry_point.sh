@@ -2,6 +2,7 @@
 #
 # IMPORTANT: Change this file only in directory StandaloneDebug!
 
+
 source /opt/bin/functions.sh
 
 export GEOMETRY="$SCREEN_WIDTH""x""$SCREEN_HEIGHT""x""$SCREEN_DEPTH"
@@ -28,9 +29,10 @@ SERVERNUM=$(get_server_num)
 
 DISPLAY=$DISPLAY \
   xvfb-run -n $SERVERNUM --server-args="-screen 0 $GEOMETRY -ac +extension RANDR" \
-  java ${JAVA_OPTS} -jar /opt/selenium/selenium-server-standalone.jar \
-  ${SE_OPTS} &
+  java ${JAVA_OPTS} -jar /opt/selenium/selenium-server-standalone.jar  \
+  ${SE_OPTS} >/dev/null 2>&1 &
 NODE_PID=$!
+echo "**** starting xvfb / selenium (pid=$NODE_PID)"
 
 trap shutdown SIGTERM SIGINT
 for i in $(seq 1 10)
@@ -39,19 +41,20 @@ do
   if [ $? -eq 0 ]; then
     break
   fi
-  echo Waiting xvfb...
+  echo "**** Waiting xvfb..."
   sleep 0.5
 done
 
-fluxbox -display $DISPLAY &
+fluxbox -display $DISPLAY >/dev/null 2>&1 &
+echo "**** fluxbox started"
 
-x11vnc $X11VNC_OPTS -forever -shared -rfbport 5900 -display $DISPLAY -bg
+x11vnc $X11VNC_OPTS -forever -shared -rfbport 5900 -display $DISPLAY -bg >/dev/null 2>&1
+echo "**** x11vnc started"
 
-#screen -t -i -d -m /home/seluser/cytoscape/cytoscape-unix-3.7.0/cytoscape.sh
+screen -f -i -d -m /home/seluser/cytoscape/cytoscape-unix-3.7.0/cytoscape.sh &
+sleep 3
+echo "**** cytoscape started"
 
-#sleep 3
-
-echo "entrypoint finished"
 exec "$@"
 
 #wait $NODE_PID

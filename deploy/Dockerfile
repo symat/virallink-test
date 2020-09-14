@@ -44,30 +44,17 @@ USER root
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 #USER seluser
 
-WORKDIR /home/seluser/cytoscape
-
-CMD ["sudo", "/usr/bin/supervisord"]
-
-ADD install_base_layer.sh /
-RUN /bin/bash /install_base_layer.sh
+WORKDIR /home/virallink
 
 ENV LANG en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
-
-ADD install_python.sh /
-RUN /bin/bash /install_python.sh
-
-ADD install_r.sh /
-RUN /bin/bash /install_r.sh
-
-EXPOSE 22
-
-ADD entry_point.sh /opt/bin/entry_point.sh
-
-WORKDIR /home/virallink
-
-ADD /pipeline /home/virallink/
 ENV PYTHONPATH /home/virallink/
 
-ENTRYPOINT /opt/bin/entry_point.sh
+ADD *.sh /
+RUN /install_base_layer.sh && /install_python.sh && /install_r.sh
+
+ADD /pipeline /home/virallink/
+
+ENTRYPOINT ["/entry_point.sh"]
+CMD ["/bin/bash"]
